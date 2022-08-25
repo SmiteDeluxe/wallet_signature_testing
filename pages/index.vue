@@ -26,7 +26,14 @@
         class="click"
         @click="signTerra()"
       >
-        Sign Terra
+        Sign TerraArb
+      </button>
+      <button
+        v-if="states.status === 'WALLET_CONNECTED'"
+        class="click"
+        @click="signTerraTx()"
+      >
+        Sign TerraTx
       </button>
     </div>
     <div v-if="states">
@@ -54,8 +61,7 @@ import { initController, getController } from "../static/controller";
 import { Subscription, combineLatest } from "rxjs";
 import * as ethUtil from "ethereumjs-util";
 import * as sigUtil from "eth-sig-util";
-import { SimplePublicKey } from "@terra-money/terra.js";
-
+import { SimplePublicKey, Fee, MsgSend } from "@terra-money/terra.js";
 export default {
   name: "IndexPage",
   data: () => ({
@@ -152,6 +158,23 @@ export default {
 
         this.validTerra = result;
       });
+    },
+    signTerraTx() {
+      this.walletController
+        .sign({
+          fee: new Fee(0, "0uusd"),
+          msgs: [
+            new MsgSend(
+              this.states.wallets[0].terraAddress,
+              this.states.wallets[0].terraAddress,
+              { uusd: 0 }
+            ),
+          ],
+          memo: "test",
+        })
+        .then((res) => {
+          console.log(res);
+        });
     },
     subscribeWallet() {
       this.subscription = combineLatest([
