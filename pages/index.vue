@@ -54,6 +54,7 @@ import { initController, getController } from "../static/controller";
 import { Subscription, combineLatest } from "rxjs";
 import * as ethUtil from "ethereumjs-util";
 import * as sigUtil from "eth-sig-util";
+import { SimplePublicKey } from "@terra-money/terra.js";
 
 export default {
   name: "IndexPage",
@@ -104,13 +105,15 @@ export default {
     },
     signEvm() {
       this.instance.eth.personal.sign(
-        this.instance.utils.fromUtf8(`I am signing my one-time nonce: 12`),
+        this.instance.utils.fromUtf8(
+          `I am signing this message with my one-time nonce: 274547 to cryptographically verify that I am the owner of this wallet`
+        ),
         this.wallet,
         (err, signature) => {
           if (err) throw new Error(err);
           console.log(signature);
 
-          const msg = `I am signing my one-time nonce: 12`;
+          const msg = `I am signing this message with my one-time nonce: 274547 to cryptographically verify that I am the owner of this wallet`;
 
           const msgBufferHex = ethUtil.bufferToHex(Buffer.from(msg, "utf8"));
           const address = sigUtil.recoverPersonalSignature({
@@ -128,13 +131,25 @@ export default {
       );
     },
     signTerra() {
-      this.walletController.signBytes(Buffer.from("Test")).then((res) => {
+      this.walletController.signBytes(Buffer.from("555492")).then((res) => {
         console.log(res);
 
-        const result = verifyBytes(Buffer.from("Test"), res.result);
+        let sigComp = {
+          recid: res.result.recid,
+          signature: res.result.signature.toString(),
+          public_key: res.result.public_key.key ?? null,
+        };
+
+        console.log(JSON.stringify(sigComp));
+        this.signedTerra = JSON.stringify(sigComp);
+
+        sigComp.public_key = new SimplePublicKey(sigComp.public_key);
+        sigComp.signature = Buffer.from(sigComp.signature.split(","));
+        console.log(sigComp);
+
+        const result = verifyBytes(Buffer.from("555492"), sigComp);
         console.log("Signature valid: " + result);
 
-        this.signedTerra = res.result.signature;
         this.validTerra = result;
       });
     },
