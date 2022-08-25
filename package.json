@@ -15,6 +15,7 @@
     "core-js": "^3.19.3",
     "eth-sig-util": "^3.0.1",
     "ethereumjs-util": "^7.1.5",
+    "isomorphic-fetch": "^3.0.0",
     "nuxt": "^2.15.8",
     "nuxt-web3": "^0.0.8",
     "rxjs": "^7.5.6",
