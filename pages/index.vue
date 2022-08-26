@@ -70,6 +70,8 @@ import {
   LCDClient,
 } from "@terra-money/terra.js";
 import { publicKeyConvert } from "secp256k1";
+import { bech32, bech32m } from "bech32";
+
 export default {
   name: "IndexPage",
   data: () => ({
@@ -127,6 +129,7 @@ export default {
           if (err) throw new Error(err);
           console.log(signature);
 
+          // Simulate backend
           const msg = `I am signing this message with my one-time nonce: 274547 to cryptographically verify that I am the owner of this wallet`;
 
           const msgBufferHex = ethUtil.bufferToHex(Buffer.from(msg, "utf8"));
@@ -157,6 +160,7 @@ export default {
         console.log(JSON.stringify(sigComp));
         this.signedTerra = JSON.stringify(sigComp);
 
+        // Simulate backend
         sigComp.public_key = new SimplePublicKey(sigComp.public_key);
         sigComp.signature = Buffer.from(sigComp.signature.split(","));
         console.log(sigComp);
@@ -173,25 +177,6 @@ export default {
         this.states.wallets[0].terraAddress,
         { uluna: 1 }
       );
-      // let gasPricesCoins = null;
-
-      // fetch("https://pisco-api.terra.dev/gas-prices", {
-      //   redirect: "follow",
-      // }).then((gasPrices) => {
-      //   gasPrices.json().then((gasPricesJson) => {
-      //     gasPricesCoins = new Coins(gasPricesJson);
-      //   });
-      // });
-
-      // const lcd = createLCDClient({
-      //   network: {
-      //     URL: "https://pisco-lcd.terra.dev", // Use "https://phoenix-lcd.terra.dev" for prod "http://localhost:1317" for localterra.
-      //     chainID: "pisco-1", // Use "phoenix-1" for production or "localterra".
-      //     gasPrices: gasPricesCoins,
-      //     gasAdjustment: "1.5", // Increase gas price slightly so transactions go through smoothly.
-      //     gas: 10000000,
-      //   },
-      // });
 
       this.walletController
         .post({
@@ -219,43 +204,27 @@ export default {
               });
 
               this.getTxInfo(lcd, res.result.txhash, 0).then((status) => {
-                console.log("test");
-                console.log(
-                  publicKeyConvert(
-                    Uint8Array.from(
-                      status.tx.auth_info.signer_infos[0].public_key.key
-                    )
-                  )
-                );
-                console.log(status);
-                console.log("test");
+                // Simulate backend
+                const sender = status.tx.body.messages[0].from_address;
+                const memo = status.tx.body.memo;
+
+                console.log(sender);
+                console.log(memo);
+                if (
+                  sender === this.states.wallets[0].terraAddress &&
+                  memo ===
+                    "I am posting this message with my one-time nonce: 274547 to cryptographically verify that I am the owner of this wallet"
+                ) {
+                  this.validTerra = true;
+                  this.signedTerra = res.result.txhash;
+                } else {
+                  this.validTerra = false;
+                  this.signedTerra = res.result.txhash;
+                }
               });
             });
           });
         });
-      // lcd.auth.accountInfo(this.wallet.terraAddress).then((info) => {
-      //   new TxAPI(lcd)
-      //     .estimateFee([{ sequenceNumber: info.sequence }], { msgs: [msg] })
-      //     .then((fee) => {
-      //       console.log(fee);
-      //     });
-      // });
-
-      // this.walletController
-      //   .post({
-      //     fee: new Fee(0, "0uusd"),
-      //     msgs: [
-      //       new MsgSend(
-      //         this.states.wallets[0].terraAddress,
-      //         this.states.wallets[0].terraAddress,
-      //         { uusd: 0 }
-      //       ),
-      //     ],
-      //     memo: "test",
-      //   })
-      //   .then((res) => {
-      //     console.log(res);
-      //   });
     },
     getTxInfo(lcd, hash, current = 0) {
       const retries = 5;
