@@ -186,44 +186,6 @@ export default {
         })
         .then((res) => {
           console.log(res);
-
-          // Fetch gas prices and convert to `Coin` format.
-          fetch("https://pisco-api.terra.dev/gas-prices", {
-            redirect: "follow",
-          }).then((gasPrices) => {
-            gasPrices.json().then((gasPricesJson) => {
-              const gasPricesCoins = new Coins(gasPricesJson);
-
-              const lcd = new LCDClient({
-                URL: "https://pisco-lcd.terra.dev/",
-                chainID: "pisco-1",
-                gasPrices: gasPricesCoins,
-                gasAdjustment: "1.5",
-                gas: 10000000,
-                isClassic: false, // optional parameter, false by default
-              });
-
-              this.getTxInfo(lcd, res.result.txhash, 0).then((status) => {
-                // Simulate backend
-                const sender = status.tx.body.messages[0].from_address;
-                const memo = status.tx.body.memo;
-
-                console.log(sender);
-                console.log(memo);
-                if (
-                  sender === this.states.wallets[0].terraAddress &&
-                  memo ===
-                    "I am posting this message with my one-time nonce: 274547 to cryptographically verify that I am the owner of this wallet"
-                ) {
-                  this.validTerra = true;
-                  this.signedTerra = res.result.txhash;
-                } else {
-                  this.validTerra = false;
-                  this.signedTerra = res.result.txhash;
-                }
-              });
-            });
-          });
         });
     },
     getTxInfo(lcd, hash, current = 0) {
