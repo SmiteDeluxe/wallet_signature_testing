@@ -88,6 +88,24 @@ export default {
     validTerra: null,
   }),
   created() {
+    fetch("http://localhost:6060/getProposalSummary/2", {
+      headers: new Headers({
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkaXNjb3JkU2VydmVySWQiOiI5NzU3NTEyMzcyNDI4Njc3NDIiLCJhY2Nlc3NUeXBlcyI6WyJnZXRSb2xlcyIsImdldENoYW5uZWxzIiwiY2hhbmdlRGlzY29yZCIsInByb2ZpbGVEZXRhaWxzIiwic2VydmVycyIsImFjdGl2ZVByb3Bvc2FscyIsImxpbmtEaXNjb3JkIiwiYW5ub3VuY2VtZW50cyIsInNlcnZlckRldGFpbHMiLCJteUxpY2Vuc2VzIiwiV0FnZXRVc2Vyc1dhbGxldHMiLCJhc3NpZ25MaWNlbnNlIiwicmVtb3ZlTGljZW5zZSIsImdldFByb3Bvc2FsU3VtbWFyeSIsIldBcmVzZXRWb3RlIiwiV0FjYXN0Vm90ZSIsIldBZ2V0UHJvcG9zYWxSZXN1bHRzIiwiV0FjbG9zZVByb3Bvc2FsIiwiV0FvcGVuUHJvcG9zYWwiLCJXQWdldFByb3Bvc2FscyIsIldBZGVsZXRlUHJvcG9zYWwiLCJXQWNyZWF0ZVByb3Bvc2FsIiwiV0FhZGRBcGlSdWxlIiwiV0FhZGRUb2tlblJ1bGUiLCJXQWFkZFN0YWtlZE5mdFJ1bGUiLCJXQWFkZE5mdFJ1bGUiLCJXQWRlbGV0ZVJ1bGUiLCJXQWdldFJ1bGVzIl0sImFjY291bnRfd2FsbGV0X2lkIjoyLCJzdWIiOiJ1c2VyIiwiaWF0IjoxNjY1NTYwOTI3LCJleHAiOjE2NjYxNjU3Mjd9.7fh_g0Jwjirgz81HBB2Pqk5Av4mcJNLZ1MOfgxQ-3KY",
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        let csvContent = "data:text/csv;charset=utf-8," + data.message;
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "my_data.csv");
+        document.body.appendChild(link); // Required for FF
+
+        link.click(); // This will download the data file named "my_data.csv".
+      });
+
     if (getController() === undefined) {
       initController().then(() => {
         this.walletController = getController();
