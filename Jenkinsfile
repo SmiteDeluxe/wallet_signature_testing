@@ -2,19 +2,10 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Deliver') {
             steps {
-                echo 'Building..'
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
+                echo 'Delivering ....'
+                sh """(cd /home/jonas/Documents/Projects/LunarHQ;git pull;npm i;tsc)"""
             }
         }
     }
