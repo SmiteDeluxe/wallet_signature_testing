@@ -147,6 +147,7 @@ export default {
         window.keplr.enable(chainId).then(() => {
           window.keplr.getKey(chainId).then((o) => {
             this.kelprWallet = o.bech32Address;
+            console.log(JSON.stringify(o.pubKey));
             console.log(o);
           });
         });
@@ -163,7 +164,11 @@ export default {
     signKelpr() {
       const chainId = "stargaze-1";
       window.keplr
-        .signArbitrary(chainId, this.kelprWallet, "test")
+        .signArbitrary(
+          chainId,
+          this.kelprWallet,
+          `I am signing this message with my one-time nonce: 1 to cryptographically verify that I am the owner of this wallet`
+        )
         .then((o) => {
           console.log(o);
         });
