@@ -85,6 +85,7 @@ import {
 } from "@terra-money/terra.js";
 import { publicKeyConvert } from "secp256k1";
 import { bech32, bech32m } from "bech32";
+import { KeplrMobileWallet } from "../utils/keplr-mobile";
 
 export default {
   name: "IndexPage",
@@ -103,6 +104,7 @@ export default {
     kelprWallet: "",
   }),
   created() {
+    console.log(wallets);
     // fetch("http://localhost:6060/getProposalSummary/2", {
     //   headers: new Headers({
     //     Authorization:
